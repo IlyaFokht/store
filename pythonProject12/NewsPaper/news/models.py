@@ -18,8 +18,14 @@ class Author(models.Model):
         self.ratingAuthor = pRat *3 +cRat
         self.save()
 
+    def __str__(self):
+        return f'{self.authorUser}'
+
 class Category(models.Model):
     name = models.CharField(max_length=64, unique=True)
+
+    def __str__(self):
+        return f'{self.name}'
 
 class Post(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
@@ -36,6 +42,9 @@ class Post(models.Model):
     title = models.CharField(max_length=128)
     text = models.TextField()
     rating = models.SmallIntegerField(default=0)
+
+    def __str__(self):
+        return f'{self.title.title()}'
 
     def like(self):
         self.rating += 1
@@ -66,3 +75,7 @@ class Comment(models.Model):
     def dislike(self):
         self.rating -= 1
         self.save()
+
+        def __str__(self):
+            return f'{self.commentUser}: {self.text[:20]}'
+
