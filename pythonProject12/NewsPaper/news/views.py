@@ -1,21 +1,51 @@
-from django.views.generic import ListView, DetailView  # импортируем класс получения деталей объекта
+from django.views.generic import ListView, DetailView,CreateView,UpdateView,DeleteView  # импортируем класс получения деталей объекта
 from .models import Post
-from datetime import datetime
-
+from django.core.paginator import Paginator
+from .filters import PostFilter
+from .forms import PostForm
 
 class PostsList(ListView):
     model = Post
     template_name = 'posts.html'
     context_object_name = 'posts'
-    queryset = Post.objects.order_by('-dateCreation')
+    ordering=['-dateCreation']
+    paginate_by = 3
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['time_now'] = datetime.utcnow()  # добавим переменную текущей даты time_now
-        context[
-            'value1'] = "ненормативная лексика"  # добавим ещё одну пустую переменную, чтобы на её примере посмотреть работу другого фильтра
-        return context
+    def get_filter(self):
+        return PostFilter(self.request.GET,queryset=super().get_queryset())
 
+    def get_queryset(self):
+        return self.get_filter().qs
+
+
+
+    def get_context_data(self,*args, **kwargs):
+        return {
+            **super().get_context_data(*args, **kwargs),
+            "filter": self.get_filter()
+        }
+
+
+class PostUpdate(UpdateView):
+    template_name = 'add.html'
+    form_class = PostForm
+
+    # метод get_object мы используем вместо queryset, чтобы получить информацию об объекте, который мы собираемся редактировать
+    def get_object(self, **kwargs):
+        id = self.kwargs.get('pk')
+        return Post.objects.get(pk=id)
+
+
+
+class PostAdd(CreateView):
+    template_name = 'add.html'
+    form_class = PostForm
+    success_url = '/news/'
+
+class PostDelete(DeleteView):
+    template_name = 'delete.html'
+    queryset = Post.objects.all()
+    success_url = '/news/'
 
 # создаём представление, в котором будут детали конкретного отдельного товара
 class PostsDetail(DetailView):
@@ -23,3 +53,25 @@ class PostsDetail(DetailView):
     template_name = 'post.html'  # название шаблона будет product.html
     context_object_name = 'post'  # название объекта. в нём будет
 
+
+
+
+class PostSearch(ListView):
+    model = Post
+    template_name = 'search.html'
+    context_object_name = 'posts'
+    ordering = ['-dateCreation']
+    paginate_by = 5
+
+    def get_filter(self):
+        return PostFilter(self.request.GET,queryset=super().get_queryset())
+
+    def get_queryset(self):
+        return self.get_filter().qs
+
+    def get_context_data(self,*args, **kwargs):
+        return {
+                **super().get_context_data(*args,**kwargs),
+                "filter":self.get_filter()
+
+        }

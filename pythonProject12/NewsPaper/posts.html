@@ -1,0 +1,44 @@
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+
+{% block title %}
+Posts
+{% endblock title %}
+
+{% block content %}
+    <h1>Все новости</h1>
+     <h4>{{ time_now|date:'M d Y' }}</h4>
+    <hr>
+    {% if posts %} <!-- Если есть товары, то выводим таблицу с ними -->
+        <table>
+            <tr>
+                <td>
+                    Заголовок
+                </td>
+                <td>
+                    Дата
+                </td>
+                <td>
+                    Статья
+                </td>
+            </tr>
+        {% for post in posts %}
+            <tr>
+                <td>
+                    {{ post.title }}
+                </td>
+                <td>
+                    {{ post.dateCreation }} <!-- дописываем специальный фильтр, чтобы ограничить количество символов до 15. Все остальные символы превратятся в многоточие. -->
+                </td>
+                <td>
+                    {{ post.text|truncatechars:50|Censor:"" }}
+                </td>
+                </td>
+            </tr>
+        {% endfor %}
+        </table>
+    {% else %}
+        <h2>Новостей нет!</h2>
+    {% endif %}
+{% endblock content %}
