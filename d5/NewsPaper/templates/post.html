@@ -1,0 +1,23 @@
+<!--  наследуемся от шаблона default.html, который мы создавали ещё во времена flatpages -->
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+<!-- Название у нас будет proudcts -->
+{% block title %}
+Posts
+{% endblock title %}
+
+<!-- В контенте на странице мы выводим сам товар, ID которого было передано в адрес -->
+{% block content %}
+<h1>{{ post }}</h1>
+ <td>
+     {{ post.dateCreation }} <!-- дописываем специальный фильтр, чтобы ограничить количество символов до 15. Все остальные символы превратятся в многоточие. -->
+ </td>
+<td>
+    {{ post.text|Censor:"" }}
+</td>
+<td>
+    <h2>{{ post.author }}</h2>
+</td>
+<a href="{% url 'news' %}">News</a> <br>
+{% endblock content %}

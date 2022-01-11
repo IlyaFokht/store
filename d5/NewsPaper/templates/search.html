@@ -1,0 +1,77 @@
+{% extends 'flatpages/default.html' %}
+
+{% block title %} Post list {% endblock title %}
+
+{% block content %}
+
+
+<!-- Перед таблицей добавим форму для поиска -->
+<form method="GET">
+    {{ filter.form }} <!-- Форму от фильтров за нас сделает django. А вот кнопку, увы придётся делать самому -->
+    <input type="submit" value="Найти">
+</form>
+
+
+
+
+<table>
+    <thead>
+        <th>
+            Name
+        </th>
+        <th>
+            Category
+        </th>
+        <th>
+            Date
+        </th>
+        <th>
+            Author
+        </th>
+    </thead>
+    {% for post in posts %} <!-- поменяем products на filter.qs, т. к. теперь мы забираем уже отобранную по каким-то параметрам информацию -->
+
+
+
+    <tr>
+        <td>
+            {{ post.title|title }}
+        </td>
+        <td>
+            {{ post.categoryType }}
+        </td>
+        <td>
+            {{ post.dateCreation }}
+        </td>
+        <td>
+            {{ post.author }}
+        </td>
+
+    </tr>
+    <a href="{% url 'post' post.id %}">{{ post.title|title }}</a>
+    {% endfor %}
+</table>
+
+{% if is_paginated %}
+
+    {% if page_obj.has_previous %}
+        <a href="?page=1">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}"><<<</a>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <a>{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">>>></a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+    {% endif %}
+
+{% endif %}
+<a href="{% url 'news' %}">News</a> <br>
+{% endblock content %}
